@@ -1,7 +1,6 @@
 terraform {
   cloud {
     organization = "Multi-Environment-Deployment" # Replace with your organization name
-    organization = "my-aws-org" # Align with workspace naming for consistency
 
     workspaces {
       name = "my-aws-org-staging" # IMPORTANT: This must match your staging workspace name in Terraform Cloud
