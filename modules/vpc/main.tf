@@ -45,7 +45,7 @@ resource "aws_subnet" "private" {
 
 resource "aws_eip" "nat_gateway" {
   count      = length(aws_subnet.public)
-  vpc        = true
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.main]
 
   tags = {

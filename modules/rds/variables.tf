@@ -47,3 +47,8 @@ variable "environment" {
   description = "The deployment environment (e.g., dev, staging, prod)"
   type        = string
 }
+
+variable "ecs_security_group_id" {
+  description = "The security group ID of the ECS service that needs to access RDS"
+  type        = string
+}

@@ -3,7 +3,7 @@ terraform {
     organization = "my-aws-org" # Replace with your organization name
 
     workspaces {
-      name = "my-aws-org-dev" # Replace with your workspace name
+      name = "my-aws-org-staging" # IMPORTANT: This must match your staging workspace name in Terraform Cloud
     }
   }
 
@@ -19,12 +19,28 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Define variables specific to the dev environment
+# Define variables that will be passed into this environment's configuration
+# These variables get their values from the Terraform Cloud workspace variables
+# configured for the "my-aws-org-staging" workspace.
 variable "environment" {
   description = "The deployment environment"
   type        = string
 }
 
+
+variable "AWS_ACCESS_KEY_ID" {
+  description = "AWS Access Key ID"
+  type        = string
+  sensitive   = true # Mark as sensitive
+  default     = ""   # Provide a default or leave it to be picked up from env
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  description = "AWS Secret Access Key"
+  type        = string
+  sensitive   = true # Mark as sensitive
+  default     = ""   # Provide a default or leave it to be picked up from env
+}
 variable "aws_region" {
   description = "The AWS region"
   type        = string
@@ -66,20 +82,20 @@ variable "instance_class" {
   type        = string
 }
 
-# Call the VPC module
+# Call the VPC module to create the Virtual Private Cloud infrastructure
 module "vpc" {
-  source = "../../modules/vpc" # Adjust path as needed
+  source = "../../modules/vpc" # Path to your VPC module
 
-  vpc_cidr            = var.vpc_cidr
-  public_subnet_cidrs = var.public_subnet_cidrs
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
-  aws_region          = var.aws_region
-  environment         = var.environment
+  aws_region           = var.aws_region
+  environment          = var.environment
 }
 
-# Call the ECS Service module
+# Call the ECS Service module to deploy your containerized application
 module "ecs_service" {
-  source = "../../modules/ecs_service" # Adjust path as needed
+  source = "../../modules/ecs_service" # Path to your ECS Service module
 
   vpc_id             = module.vpc.vpc_id
   public_subnet_ids  = module.vpc.public_subnet_ids
@@ -89,9 +105,9 @@ module "ecs_service" {
   desired_count      = var.desired_count
 }
 
-# Call the RDS module
+# Call the RDS module to provision your Relational Database Service instance
 module "rds" {
-  source = "../../modules/rds" # Adjust path as needed
+  source = "../../modules/rds" # Path to your RDS module
 
   vpc_id              = module.vpc.vpc_id
   private_subnet_ids  = module.vpc.private_subnet_ids
@@ -101,21 +117,9 @@ module "rds" {
   environment         = var.environment
 }
 
-output "dev_alb_dns_name" {
-  description = "The ALB DNS name for the dev environment"
+# Define outputs that will be visible in the Terraform Cloud workspace
+# after a successful apply for the staging environment.
+output "staging_alb_dns_name" {
+  description = "The ALB DNS name for the staging environment"
   value       = module.ecs_service.alb_dns_name
-}
-
-variable "AWS_ACCESS_KEY_ID" {
-  description = "AWS Access Key ID"
-  type        = string
-  sensitive   = true # Mark as sensitive
-  default     = ""   # Provide a default or leave it to be picked up from env
-}
-
-variable "AWS_SECRET_ACCESS_KEY" {
-  description = "AWS Secret Access Key"
-  type        = string
-  sensitive   = true # Mark as sensitive
-  default     = ""   # Provide a default or leave it to be picked up from env
 }

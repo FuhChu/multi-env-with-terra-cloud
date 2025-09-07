@@ -19,7 +19,8 @@ resource "aws_security_group" "rds_access" {
     protocol  = "tcp"
     # This should be restricted to the security group of the ECS tasks
     # For now, we'll allow from inside the VPC for simplicity, but refine in a real project
-    cidr_blocks = [lookup(data.aws_vpc.selected.cidr_block, "0", var.vpc_id)] # Placeholder for security group of ECS
+       # Allows access from the entire VPC CIDR block where the RDS instance resides
+    cidr_blocks = [data.aws_vpc.selected.cidr_block]
   }
 
   egress {
@@ -54,6 +55,33 @@ resource "aws_db_instance" "main" {
 
   tags = {
     Name        = "${var.environment}-${var.db_name}-db"
+    Environment = var.environment
+  }
+}
+
+resource "aws_security_group" "rds_access_sg" {
+  name        = "${var.environment}-rds-access-sg"
+  description = "Allow inbound access to RDS from ECS service"
+  vpc_id      = data.aws_vpc.selected.id # Use the ID from the data source
+
+  ingress {
+    description = "Allow access from ECS tasks"
+    from_port   = 5432 # Or your database port (e.g., 3306 for MySQL, 5432 for PostgreSQL)
+    to_port     = 5432
+    protocol    = "tcp"
+    # Referencing the ECS security group ID directly
+    security_groups = [var.ecs_security_group_id] # This variable needs to be passed to the RDS module
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.environment}-rds-access-sg"
     Environment = var.environment
   }
 }
