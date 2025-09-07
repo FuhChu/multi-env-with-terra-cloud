@@ -40,7 +40,7 @@ variable "allocated_storage" {
 variable "engine_version" {
   description = "The engine version of the database"
   type        = string
-  default     = "13.7"
+  default     = "13.14"
 }
 
 variable "environment" {

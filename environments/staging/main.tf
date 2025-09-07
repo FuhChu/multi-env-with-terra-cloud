@@ -1,6 +1,7 @@
 terraform {
   cloud {
-    organization = "my-aws-org" # Replace with your organization name
+    organization = "Multi-Environment-Deployment" # Replace with your organization name
+    organization = "my-aws-org" # Align with workspace naming for consistency
 
     workspaces {
       name = "my-aws-org-staging" # IMPORTANT: This must match your staging workspace name in Terraform Cloud
@@ -77,6 +78,7 @@ module "vpc" {
   private_subnet_cidrs = var.private_subnet_cidrs
   aws_region           = var.aws_region
   environment          = var.environment
+  single_nat_gateway   = true # Use a single NAT gateway for cost savings
 }
 
 # Call the ECS Service module to deploy your containerized application

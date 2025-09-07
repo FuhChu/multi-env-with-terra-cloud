@@ -1,6 +1,6 @@
 terraform {
   cloud {
-    organization = "my-aws-org" # Replace with your organization name
+    organization = "Multi-Environment-Deployment" # Replace with your organization name
 
     workspaces {
       name = "my-aws-org-prod" # Replace with your workspace name

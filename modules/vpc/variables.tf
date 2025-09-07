@@ -22,3 +22,9 @@ variable "environment" {
   description = "The deployment environment (e.g., dev, staging, prod)"
   type        = string
 }
+
+variable "single_nat_gateway" {
+  description = "If true, create a single NAT Gateway and share it across all private subnets."
+  type        = bool
+  default     = false
+}
