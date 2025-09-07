@@ -1,6 +1,6 @@
 terraform {
   cloud {
-    organization = "my-aws-org" # Replace with your organization name
+    organization = "Multi-Environment-Deployment" # Replace with your organization name
 
     workspaces {
       name = "my-aws-org-dev" # Replace with your workspace name
@@ -99,23 +99,10 @@ module "rds" {
   db_password         = var.db_password
   instance_class      = var.instance_class
   environment         = var.environment
+  ecs_security_group_id = module.ecs_service.ecs_security_group_id
 }
 
 output "dev_alb_dns_name" {
   description = "The ALB DNS name for the dev environment"
   value       = module.ecs_service.alb_dns_name
-}
-
-variable "AWS_ACCESS_KEY_ID" {
-  description = "AWS Access Key ID"
-  type        = string
-  sensitive   = true # Mark as sensitive
-  default     = ""   # Provide a default or leave it to be picked up from env
-}
-
-variable "AWS_SECRET_ACCESS_KEY" {
-  description = "AWS Secret Access Key"
-  type        = string
-  sensitive   = true # Mark as sensitive
-  default     = ""   # Provide a default or leave it to be picked up from env
 }
