@@ -27,20 +27,6 @@ variable "environment" {
   type        = string
 }
 
-
-variable "AWS_ACCESS_KEY_ID" {
-  description = "AWS Access Key ID"
-  type        = string
-  sensitive   = true # Mark as sensitive
-  default     = ""   # Provide a default or leave it to be picked up from env
-}
-
-variable "AWS_SECRET_ACCESS_KEY" {
-  description = "AWS Secret Access Key"
-  type        = string
-  sensitive   = true # Mark as sensitive
-  default     = ""   # Provide a default or leave it to be picked up from env
-}
 variable "aws_region" {
   description = "The AWS region"
   type        = string
@@ -115,6 +101,7 @@ module "rds" {
   db_password         = var.db_password
   instance_class      = var.instance_class
   environment         = var.environment
+  ecs_security_group_id = module.ecs_service.ecs_security_group_id
 }
 
 # Define outputs that will be visible in the Terraform Cloud workspace

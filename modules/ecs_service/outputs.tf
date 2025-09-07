@@ -15,5 +15,5 @@ output "alb_dns_name" {
 
 output "ecs_security_group_id" {
   description = "The ID of the ECS service security group"
-  value       = aws_security_group.ecs_service_sg.id # Assuming you named it this way
+  value       = aws_security_group.ecs_tasks.id
 }
